@@ -43,4 +43,4 @@ public class MobileJoystick : MonoBehaviour,
         InputDirection = Vector2.zero;
         handle.anchoredPosition = Vector2.zero;
     }
-}
+}}

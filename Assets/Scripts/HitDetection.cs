@@ -9,18 +9,42 @@ public class HitDetection : NetworkBehaviour
 
     public void ApplyHit(bool isHeadshot)
     {
-        if (!IsServer) return;
+        if (!IsServer)
+            return;
 
         int damage = isHeadshot
             ? headshotDamage
             : bodyDamage;
 
         PlayerHealth health =
-            GetComponent<PlayerHealth>();
+            GetComponentInParent<PlayerHealth>();
 
-        if (health != null)
+        if (health == null)
+            return;
+
+        if (health.Health.Value <= 0)
+            return;
+
+        health.TakeDamage(damage);
+
+        if (isHeadshot)
         {
-            health.TakeDamage(damage);
+            Debug.Log("HEADSHOT! 100 DAMAGE!");
+        }
+        else
+        {
+            Debug.Log("BODY HIT! 25 DAMAGE!");
+        }
+
+        if (health.Health.Value <= 0)
+        {
+            PlayerElimination elimination =
+                GetComponentInParent<PlayerElimination>();
+
+            if (elimination != null)
+                elimination.EliminatePlayer();
+
+            Debug.Log("PLAYER ELIMINATED!");
         }
     }
 }

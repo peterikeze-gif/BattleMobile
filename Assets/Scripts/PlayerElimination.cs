@@ -11,6 +11,16 @@ public class PlayerElimination : NetworkBehaviour
             NetworkVariableWritePermission.Server
         );
 
+    public override void OnNetworkSpawn()
+    {
+        IsEliminated.OnValueChanged += OnEliminationChanged;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        IsEliminated.OnValueChanged -= OnEliminationChanged;
+    }
+
     public void EliminatePlayer()
     {
         if (!IsServer || IsEliminated.Value)
@@ -18,6 +28,21 @@ public class PlayerElimination : NetworkBehaviour
 
         IsEliminated.Value = true;
 
-        Debug.Log("Player eliminated!");
+        Debug.Log("PLAYER ELIMINATED!");
+        EliminationMessageRpc(OwnerClientId);
+    }
+
+    private void OnEliminationChanged(bool oldValue, bool newValue)
+    {
+        if (newValue)
+        {
+            Debug.Log("A PLAYER HAS BEEN ELIMINATED!");
+        }
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void EliminationMessageRpc(ulong playerId)
+    {
+        Debug.Log("Player " + playerId + " has been eliminated!");
     }
 }
